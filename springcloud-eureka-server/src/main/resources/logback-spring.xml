@@ -5,8 +5,8 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 
     <contextName>PhoneverifyModule</contextName>
 
-    <property name="LOG_HOME" value="/logdata/eureka"/>
-    <property name="MODULE_NAME" value="eureka"/>
+    <property name="LOG_HOME" value="/logdata/eureka/server"/>
+    <property name="MODULE_NAME" value="server"/>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
