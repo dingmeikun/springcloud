@@ -1,0 +1,26 @@
+spring: 
+    application: 
+        name: eureka-server
+
+logging: 
+    config: classpath:logback-spring.xml
+
+info: #项目信息
+  app: 
+    name: ${spring.application.name}
+    desc: eureka-server
+    
+server: 
+  port: 8000
+  
+eureka: 
+    instance: 
+        hostname: dingmk.com
+        ipAddress: 192.168.101.15
+        instance-id: dingmk.com:${server.port}
+        preferIpAddress: false
+    client: 
+        registerWithEureka: false #是否将自己注册到eureka server，集群时设置为true
+        fetchRegistry: false #是否从eureka集群获取注册信息，集群时设置为true
+        serviceUrl: 
+            defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
