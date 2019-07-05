@@ -17,10 +17,6 @@
 		https://www.jb51.net/article/146335.htm
 	</description>
 
-	<modules>
-        <module>springcloud-eureka-server</module>
-    </modules>
-
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -38,7 +34,15 @@
         <maven-scm-plugin.version>1.9.5</maven-scm-plugin.version>
         <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
 	</properties>
-
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.28</version>
+		</dependency>
+	</dependencies>
+	
 	<dependencyManagement>
         <dependencies>
             <dependency>

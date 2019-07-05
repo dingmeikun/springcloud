@@ -1,0 +1,14 @@
+server:
+  port: 8001
+  
+logging: 
+    config: classpath:logback-spring.xml
+
+spring: 
+    application:
+        name: baseinfo-service
+        
+eureka: 
+  client:
+    serviceUrl:
+          defaultZone: http://192.168.101.15:8000/eureka
