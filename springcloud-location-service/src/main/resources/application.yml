@@ -1,0 +1,22 @@
+server:
+  port: 8003
+  
+logging: 
+    config: classpath:logback-spring.xml
+
+spring: 
+    application:
+        name: location-service
+    data: 
+        mongodb: 
+            uri: mongodb://192.168.101.213:27017/admin
+            dbname: locationInfo
+            database: locationInfo
+            maxDixtance: 10000 #单位 米
+            gaodeCollectionName: gaode_location_info
+            baiduCollectionName: baidu_location_info
+        
+eureka: 
+  client:
+    serviceUrl:
+          defaultZone: http://192.168.101.15:8000/eureka
