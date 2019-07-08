@@ -1,0 +1,50 @@
+server: 
+  port: 8002
+
+spring: 
+    application: 
+        name: eureka-feign
+
+logging: 
+    config: classpath:logback-spring.xml
+    
+eureka: 
+    client: 
+        serviceUrl: 
+            defaultZone: http://192.168.101.15:8000/eureka
+
+# 
+feign:
+   hystrix:
+      enabled: true
+   httpclient:
+      enabled: true
+      connpool: # 微服务Feign客户端配置
+         maxTotalPoolConn: 2048
+         maxPerRoute: 1024
+         connectionRequestTimeout: 1500
+         connectTimeout: 1500
+         socketTimeout: 2000
+         idleConnTimeout: 20000
+         connectionTimerRepeat: 5000
+         httpRequestRetryLimit: 1
+         httpRequestRetryEnable: true
+
+# 负载均衡配置
+ribbon:
+   OkToRetryOnAllOperations: false
+   ReadTimeout: 1100
+   ConnectTimeout: 1100
+   MaxAutoRetries: 1
+   MaxAutoRetriesNextServer: 1
+
+# 熔断器配置
+hystrix:
+   command:
+      default:
+         execution:
+            timeout:
+               enabled: true
+            isolation:
+               thread:
+                  timeoutInMilliseconds: 2000
