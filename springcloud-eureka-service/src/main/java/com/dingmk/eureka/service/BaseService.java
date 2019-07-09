@@ -29,7 +29,7 @@ public class BaseService {
 		
 		BaseResponse response = new BaseResponse();
 		response.setCoordsys("net");
-		response.setLocation(location.getLng() + "" + location.getLat());
+		response.setLocation(location.getLng() + ", " + location.getLat());
 		response.setAddress(address);
 		
 		return response;

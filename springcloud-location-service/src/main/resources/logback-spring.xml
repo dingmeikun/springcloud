@@ -44,7 +44,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
     <logger name="org.springframework.*" level="info"/>
     <logger name="org.springframework.jdbc.datasource" level="info"/>
     <logger name="org.apache.ibatis.*" level="debug" />
-    <logger name="com.xy" level="debug"/>
+    <logger name="com.dingmk" level="debug"/>
 
     <root level="info">
         <appender-ref ref="SystemLogService"/>

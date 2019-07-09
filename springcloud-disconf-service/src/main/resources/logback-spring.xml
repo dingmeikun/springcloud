@@ -46,7 +46,7 @@
     <logger name="org.springframework.*" level="info"/>
     <logger name="org.springframework.jdbc.datasource" level="info"/>
     <logger name="org.apache.ibatis.*" level="info"/>
-    <logger name="com.xy" level="debug"/>
+    <logger name="com.dingmk" level="debug"/>
 
     <root level="info">
         <appender-ref ref="SystemLogService"/>

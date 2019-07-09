@@ -10,7 +10,7 @@ import com.dingmk.eureka.config.BaseResponse;
 import com.dingmk.eureka.feign.config.FeignConfig;
 import com.dingmk.eureka.hystrix.BaseHystrix;
 
-@FeignClient(value = "baseinfo-service", configuration = FeignConfig.class, fallback = BaseHystrix.class)
+@FeignClient(value = "eureka-service", configuration = FeignConfig.class, fallback = BaseHystrix.class)
 public interface BaseServiceFeign {
 
 	@RequestMapping(value = "/data/service/query/v1", method = RequestMethod.POST)
