@@ -12,3 +12,8 @@ eureka:
   client:
     serviceUrl:
           defaultZone: http://192.168.101.15:8000/eureka
+          
+# 其余配置
+service-B:
+   ribbon:
+      NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
