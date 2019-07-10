@@ -12,14 +12,32 @@
 	<packaging>pom</packaging>
 	
 	<modules>
+		<module>spring-hystrix-dashboard</module>
         <module>spring-turbine-dashboard</module>
+		<module>spring-turbine-node1</module>
+		<module>spring-turbine-node2</module>
     </modules>
 	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
+				<artifactId>spring-hystrix-dashboard</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
 				<artifactId>spring-turbine-dashboard</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>spring-turbine-node1</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>spring-turbine-node2</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>

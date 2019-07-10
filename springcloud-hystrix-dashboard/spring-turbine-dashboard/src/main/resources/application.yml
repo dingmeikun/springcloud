@@ -24,7 +24,7 @@ eureka:
 
 turbine:
   combineHostPort: true
-  appConfig: ribbon-client
+  appConfig: ribbon-client,ribbon-client2
   clusterNameExpression: metadata['cluster']
   aggregator:
     clusterConfig: ribbon
