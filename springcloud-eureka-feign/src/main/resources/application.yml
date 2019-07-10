@@ -13,7 +13,7 @@ eureka:
         serviceUrl: 
             defaultZone: http://192.168.101.15:8000/eureka
 
-# 
+#feign配置
 feign:
    hystrix:
       enabled: true
