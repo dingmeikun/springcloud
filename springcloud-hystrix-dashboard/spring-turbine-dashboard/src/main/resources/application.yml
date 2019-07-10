@@ -9,23 +9,22 @@ spring:
         name: turbine-dashboard
         
 eureka: 
-   instance:
-      ipAddress: 192.168.101.15 #当前主机IP
-      preferIpAddress: true #是否使用当前IP显示
-      name: ${spring.application.name}
-      metadataMap:
-         zone: ${eurekaZone}
-      instanceId: ${eureka.instance.ipAddress}:${server.port}
    client:
       serviceUrl:
          defaultZone: http://192.168.101.15:8000/eureka
-      healthcheck:
-         enabled: true
 
 turbine:
   combineHostPort: true
-  appConfig: ribbon-client,ribbon-client2
-  clusterNameExpression: metadata['cluster']
+  appConfig: turbine-node1,turbine-node2
+  clusterNameExpression: new String("default")
   aggregator:
-    clusterConfig: ribbon
+    clusterConfig: default
   instanceUrlSuffix: /hystrix.stream
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+       
+bash-path: /
