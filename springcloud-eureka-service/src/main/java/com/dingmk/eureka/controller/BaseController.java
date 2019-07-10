@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-public class infoSearchController {
+public class BaseController {
 	
 	@Autowired
 	private BaseService service;
