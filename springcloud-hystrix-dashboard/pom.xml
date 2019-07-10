@@ -15,4 +15,13 @@
         <module>spring-turbine-dashboard</module>
     </modules>
 	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>spring-turbine-dashboard</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
