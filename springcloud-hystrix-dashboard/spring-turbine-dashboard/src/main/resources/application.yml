@@ -9,9 +9,18 @@ spring:
         name: turbine-dashboard
         
 eureka: 
-  client:
-    serviceUrl:
-          defaultZone: http://192.168.101.15:8000/eureka
+   instance:
+      ipAddress: 192.168.101.15 #当前主机IP
+      preferIpAddress: true #是否使用当前IP显示
+      name: ${spring.application.name}
+      metadataMap:
+         zone: ${eurekaZone}
+      instanceId: ${eureka.instance.ipAddress}:${server.port}
+   client:
+      serviceUrl:
+         defaultZone: http://192.168.101.15:8000/eureka
+      healthcheck:
+         enabled: true
 
 turbine:
   combineHostPort: true

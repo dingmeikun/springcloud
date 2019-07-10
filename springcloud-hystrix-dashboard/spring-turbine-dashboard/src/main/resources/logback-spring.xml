@@ -5,8 +5,8 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 
     <contextName>PhoneverifyModule</contextName>
 
-    <property name="LOG_HOME" value="/logdata/ribbon/client"/>
-    <property name="MODULE_NAME" value="client"/>
+    <property name="LOG_HOME" value="/logdata/turbine/dashboard"/>
+    <property name="MODULE_NAME" value="turbine"/>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
