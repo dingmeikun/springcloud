@@ -25,6 +25,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
-       
-bash-path: /
+        include: '*'
+      base-path: /
