@@ -15,3 +15,6 @@ server模块主要做服务分发的功能，对外提供总的服务入库，�
 	zuul-simple：简单微服务，注册到eureka-server，启动并对外提供服务。
 	
 过程：外部客户端都是请求的zuul-server，由zuul-server的routes规则节点配置路由，转到zuul-simple的/zuul/v1中去请求，最终zuul-simple接收到请求，并处理返回。
+
+	# 最终的过程是
+	$ http://GATEWAY:GATEWAY_PORT/想要访问的Eureka服务id的小写/**     --->>>>  将会访问到--->>>       http://想要访问的Eureka服务id的小写:该服务端口/**
