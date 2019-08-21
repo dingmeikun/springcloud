@@ -1,0 +1,1 @@
+oauth2-service的配置类，编写认证授权服务器适配器OAuthConfiguration类，这里主要指定类客户端ID、密钥，以及权限定义与作用范围的声明，指定类TokenStore为JWT

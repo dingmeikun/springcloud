@@ -1,0 +1,46 @@
+server:
+   port: 8010 # zuul服务端口为8010，在做路由转发时，将会转到8012上的服务上去消费
+   servlet:
+      contextPath: /uaa # web路径
+
+logging: 
+    config: classpath:logback-spring.xml
+
+spring: 
+    application:
+        name: zuul-oauth2-server
+
+eureka: 
+   client:
+      serviceUrl:
+         defaultZone: http://192.168.101.15:8000/eureka
+   instance:
+      prefer-ip-address: true
+
+zuul:
+#   servlet-path: /
+   routes:
+      zuul-oauth2-simple:
+         path: /service/** # 匹配/service/后面的多级uri，表达式有(1):/service/** 多级/A/B/CC/CCC,(2):/service/* 单级/A /B /CC /CCC,(3):/service/? 单字符/A /B /C /D 注：/A 为zull-simple的服务uri
+         serviceId: zuul-oauth2-simple
+   host:
+      connect-timeout-millis: 15000 #HTTP连接超时要比Hystrix的大
+      socket-timeout-millis: 60000   #socket超时
+
+ribbon:
+   ReadTimeout: 10000
+   ConnectTimeout: 10000
+
+security:
+   basic:
+      enabled: false # 启用SpringSecurity的安全配置项
+   oauth2:
+      client:
+         access-token-uri: http://192.168.101.15:8011/uaa/oauth/token #令牌端点
+         user-authorization-uri: http://192.168.101.15:8011/uaa/oauth/authorize #授权端点
+         # 授权端点
+         client-id: zuul_oauth2_server # OAuth2客户端ID
+         client-secret: secret # OAuth2客户端秘钥
+      resource:
+         jwt:
+            key-value: springcloud123  # 使用对称加密方式，默认使用SHA256

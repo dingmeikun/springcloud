@@ -1,0 +1,18 @@
+server:
+   port: 8011 # zuul服务端口为8009，在做路由转发时，将会转到8008上的服务上去消费
+   servlet:
+      contextPath: /uaa # web路径
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring: 
+    application:
+        name: zuul-oauth2-service
+
+eureka: 
+   client:
+      serviceUrl:
+         defaultZone: http://192.168.101.15:8000/eureka
+   instance:
+      prefer-ip-address: true
