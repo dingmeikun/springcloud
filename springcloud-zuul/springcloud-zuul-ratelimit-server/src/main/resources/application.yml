@@ -1,0 +1,49 @@
+server:
+   port: 8013 # zuul服务端口为8013，在做路由转发时，将会转到8008上的服务上去消费
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring: 
+   application:
+      name: zuul-ratelimit-server
+   redis:
+      host: 192.168.101.213
+      port: 6379
+      password: szdev
+
+eureka: 
+   client:
+      serviceUrl:
+         defaultZone: http://192.168.101.15:8000/eureka
+   instance:
+      prefer-ip-address: true
+
+zuul:
+   routes:
+      zuul-simple:
+         path: /service/** # 匹配/service/后面的多级uri，表达式有(1):/service/** 多级/A/B/CC/CCC,(2):/service/* 单级/A /B /CC /CCC,(3):/service/? 单字符/A /B /C /D 注：/A 为zull-simple的服务uri
+         serviceId: zuul-simple
+
+   ratelimit:
+      key-prefix: service  #对应用来标识请求的key的前缀
+      enabled: true
+      #repository: IN_MEMORY  #对应存储类型（用来存储统计信息）REDIS
+      #behind-proxy: true  #代理之后
+      default-policy: #可选 - 针对所有的路由配置的策略，除非特别配置了policies
+         limit: 10 #可选 - 每个刷新时间窗口对应的请求数量限制
+         quota: 1000 #可选-  每个刷新时间窗口对应的请求时间限制（秒）
+         refresh-interval: 60 # 刷新时间窗口的时间，默认值 (秒)
+         type: url #可选 限流方式
+         #   - user
+         #   - origin
+         #   - url
+         policies:
+            myServiceId: #特定的路由
+               limit: 10 #可选- 每个刷新时间窗口对应的请求数量限制
+               quota: 1000 #可选-  每个刷新时间窗口对应的请求时间限制（秒）
+               refresh-interval: 60 # 刷新时间窗口的时间，默认值 (秒)
+               type: url #可选 限流方式
+               #   - user
+               #   - origin
+               #   - url
