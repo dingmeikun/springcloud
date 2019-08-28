@@ -40,6 +40,11 @@ ribbon:
 
 # 熔断器配置
 hystrix:
+   threadpool:
+      default:
+         coreSize: 20
+         maximumSize: 50
+         allowMaximumSizeToDivergeFromCoreSize: true
    command:
       default:
          execution:
