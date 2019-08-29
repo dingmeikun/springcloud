@@ -1,0 +1,7 @@
+spring:
+   cloud:
+      config:
+         label: master
+         uri: http://192.168.101.15:8014
+         name: config-info
+         profile: dev

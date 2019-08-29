@@ -1,0 +1,23 @@
+server:
+   port: 8017
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring: 
+   application:
+      name: config-server-bus
+   cloud:
+      config:
+         server:
+            git:
+               uri: https://github.com/dingmeikun/tspring-config.git
+               username: dingmeikun
+               password: a3607311994
+               search-paths: DMK_CONFIG_TEST
+
+#rabbitmq:
+#   host: 192.168.101.15
+#   port: 5672
+#   username: guest
+#   password: guest

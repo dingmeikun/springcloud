@@ -1,0 +1,10 @@
+server:
+   port: 8016
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring: 
+   application:
+      name: config-client-bus
+
