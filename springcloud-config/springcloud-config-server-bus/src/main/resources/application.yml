@@ -16,8 +16,8 @@ spring:
                password: a3607311994
                search-paths: DMK_CONFIG_TEST
 
-#rabbitmq:
-#   host: 192.168.101.15
-#   port: 5672
-#   username: guest
-#   password: guest
+rabbitmq:
+   host: 192.168.101.15
+   port: 5672
+   username: guest
+   password: guest
