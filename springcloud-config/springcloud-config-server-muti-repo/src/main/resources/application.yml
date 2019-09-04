@@ -1,0 +1,31 @@
+server:
+   port: 8018
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring:
+   application:
+      name: config-server-muti-repo
+   cloud:
+      config:
+         server:
+            git:
+               uri: https://github.com/dingmeikun/tspring-config.git
+               username: dingmeikun
+               password: a3607311994
+               search-paths: DMK_CONFIG_TEST
+               repos:
+                  simple: https://github.com/dingmeikun/tspring-config-simple
+                  special: 
+                     pattern: special*/special*dev*,*special*/special*dev*
+                     uri: https://github.com/dingmeikun/tspring-config-special
+                  local:
+                     pattern: local-config*
+                     uri: C:/Users/user/Desktop/config/local-config
+                     
+rabbitmq:
+   host: 192.168.101.15
+   port: 5672
+   username: guest
+   password: guest

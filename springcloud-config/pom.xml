@@ -17,6 +17,8 @@
 		<module>springcloud-config-client-manualfresh</module>
 		<module>springcloud-config-server-bus</module>
 		<module>springcloud-config-client-bus</module>
+		<module>springcloud-config-client-muti-repo</module>
+		<module>springcloud-config-server-muti-repo</module>
     </modules>
     
     <dependencies>
@@ -65,6 +67,16 @@
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>springcloud-config-client-bus</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-config-server-muti-repo</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-config-client-muti-repo</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			
