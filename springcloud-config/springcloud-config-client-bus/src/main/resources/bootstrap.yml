@@ -4,4 +4,5 @@ spring:
          label: master
          uri: http://192.168.101.15:8017
          name: config-info
+         # name: tspring-config # 当请求进来访问config-client-bus时，会将该name：tspring-config，把config-server-bus中的uri中的{application}替换掉，并且会去它指定目录下拿取tspring-config.yml配置文件。
          profile: dev
