@@ -16,10 +16,8 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-config-client</artifactId>
-			<version>1.4.0.RELEASE</version>
+			<groupId>com.dingmk.learn</groupId>
+			<artifactId>springcloud-config-client-autorefresh</artifactId>
 		</dependency>
-		
 	</dependencies>
 </project>

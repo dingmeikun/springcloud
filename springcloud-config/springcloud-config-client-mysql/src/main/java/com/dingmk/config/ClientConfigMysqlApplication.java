@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ClientConfigGitApplication {
+public class ClientConfigMysqlApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ClientConfigGitApplication.class, args);
+		SpringApplication.run(ClientConfigMysqlApplication.class, args);
 	}
 }

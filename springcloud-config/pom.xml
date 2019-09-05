@@ -21,6 +21,7 @@
 		<module>springcloud-config-server-muti-repo</module>
 		<module>springcloud-config-client-mysql</module>
 		<module>springcloud-config-server-mysql</module>
+		<module>springcloud-config-client-autorefresh</module>
     </modules>
     
     <dependencies>
@@ -92,6 +93,11 @@
 				<version>${project.version}</version>
 			</dependency>
 			
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-config-client-autorefresh</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>tim-utils</artifactId>

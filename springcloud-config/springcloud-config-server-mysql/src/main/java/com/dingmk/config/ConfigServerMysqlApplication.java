@@ -6,9 +6,9 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 
 @SpringBootApplication
 @EnableConfigServer
-public class ConfigServerGitApplication {
+public class ConfigServerMysqlApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ConfigServerGitApplication.class, args);
+		SpringApplication.run(ConfigServerMysqlApplication.class, args);
 	}
 }

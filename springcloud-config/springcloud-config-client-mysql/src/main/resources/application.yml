@@ -7,4 +7,6 @@ logging:
 spring: 
    application:
       name: config-client-mysql-repo
-
+   cloud:
+      config:
+         refreshInterval: 10
