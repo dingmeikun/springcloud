@@ -1,0 +1,10 @@
+server:
+   port: 8019
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring: 
+   application:
+      name: config-client-mysql-repo
+

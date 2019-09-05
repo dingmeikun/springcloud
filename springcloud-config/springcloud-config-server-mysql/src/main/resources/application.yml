@@ -1,0 +1,31 @@
+server:
+   port: 8018
+
+logging: 
+   config: classpath:logback-spring.xml
+
+spring:
+   application:
+      name: config-server-mysql-repo
+   cloud:
+      config:
+         server:
+            jdbc:
+               sql: select `key`, `value` from properties where application = ? and profile = ? and lable = ?;
+         label: master
+      refresh: 
+         refreshable: none
+   profiles:
+      active: jdbc
+   # 数据源配置
+   datasource:
+      url: jdbc:mysql://192.168.101.15:3306/spring_config?useUnicode=true&characterEncoding=utf-8
+      username: dingmk
+      password: 123456
+      driver-class-name: com.mysql.jdbc.Driver
+
+#rabbitmq:
+#   host: 192.168.101.15
+#   port: 5672
+#   username: guest
+#   password: guest

@@ -19,6 +19,8 @@
 		<module>springcloud-config-client-bus</module>
 		<module>springcloud-config-client-muti-repo</module>
 		<module>springcloud-config-server-muti-repo</module>
+		<module>springcloud-config-client-mysql</module>
+		<module>springcloud-config-server-mysql</module>
     </modules>
     
     <dependencies>
@@ -77,6 +79,16 @@
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>springcloud-config-client-muti-repo</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-config-client-mysql</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-config-server-mysql</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			
