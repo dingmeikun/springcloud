@@ -1,0 +1,17 @@
+server:
+   port: 9018
+
+spring:
+   application:
+      name: config-apollo-client
+
+eureka:
+   client:
+      service-url:
+         defaultZone: http://192.168.101.15:8000/eureka/
+
+apollo:
+   bootstrap:
+      enabled: true
+      namespaces: application
+   meta: http://n-demo.novalocal:8080
