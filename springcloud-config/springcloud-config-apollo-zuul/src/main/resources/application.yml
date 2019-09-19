@@ -1,17 +1,23 @@
 server:
-   port: 8018
+   port: 8019
 
 spring:
    application:
-      name: config-apollo-service
+      name: config-apollo-zuul-server
 
 eureka:
    client:
       service-url:
          defaultZone: http://192.168.101.15:8000/eureka/
 
+zuul:
+  routes:
+    client-apollo:
+      path: /client/**
+      serviceId: config-apollo-service
+
 apollo:
    bootstrap:
       enabled: true
-      namespaces: application
+      namespaces: TEST1.zuul_config
    meta: http://n-demo.novalocal:8080

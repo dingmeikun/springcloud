@@ -14,4 +14,4 @@ apollo部署后，可以使用自带的项目，也可新建项目，appid设置
 直接对本项目打包即可：clean install(package)，之后部署项目，执行无报错即可。
 
 #### 测试效果
-在浏览器访问：http://192.168.101.218:9018/configConsumer/getConfigInfo
+在浏览器访问：http://192.168.101.218:8018/configConsumer/getConfigInfo
