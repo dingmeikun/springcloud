@@ -1,0 +1,50 @@
+spring: 
+    application: 
+        name: springcloud-eureka-cluster
+
+logging: 
+    config: classpath:logback-spring.xml
+
+info: #项目信息
+  app: 
+    name: ${spring.application.name}
+    #index: http://www.bizport.cn/
+    desc: 生产系统服务注册中心
+
+---
+## node 1
+spring: 
+  profiles: eurekaserver1
+server: 
+  port: 8889
+  
+eureka: 
+    instance: 
+        hostname: eurekaserver1
+        ipAddress: 10.26.90.97
+        instance-id: eurekaserver1:${server.port}
+        preferIpAddress: false
+    client: 
+        registerWithEureka: true #是否将自己注册到eureka server
+        fetchRegistry: true #是否从eureka集群获取注册信息
+        serviceUrl: 
+            defaultZone: http://eurekaserver2:8889/eureka
+
+---
+## node 2
+spring: 
+  profiles: eurekaserver2
+server: 
+  port: 8889
+  
+eureka: 
+    instance: 
+        hostname: eurekaserver2
+        ipAddress: 10.47.90.177
+        instance-id: eurekaserver2:${server.port}
+        preferIpAddress: false
+    client: 
+        registerWithEureka: true
+        fetchRegistry: true
+        serviceUrl: 
+            defaultZone: http://eurekaserver1:8889/eureka

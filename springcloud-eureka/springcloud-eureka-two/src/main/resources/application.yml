@@ -1,0 +1,50 @@
+spring: 
+    application: 
+        name: springcloud-eureka-two
+
+logging: 
+    config: classpath:logback-spring.xml
+
+info: #项目信息
+  app: 
+    name: ${spring.application.name}
+    #index: http://www.bizport.cn/
+    desc: 生产系统服务注册中心
+
+---
+## node 1
+spring: 
+  profiles: dingmk1.com
+server: 
+  port: 8888
+  
+eureka: 
+    instance: 
+        hostname: dingmk1.com #本机域名转换为127.0.0.1 dingmk1.com和127.0.0.1 dingmk2.com
+        ipAddress: 192.168.101.15 #本机IP
+        instance-id: dingmk1.com:${server.port}
+        preferIpAddress: false
+    client: 
+        registerWithEureka: true #是否将自己注册到eureka server
+        fetchRegistry: true #是否从eureka集群获取注册信息
+        serviceUrl: 
+            defaultZone: http://dingmk2.com:8889/eureka
+
+---
+## node 2
+spring: 
+  profiles: dingmk2.com
+server: 
+  port: 8889
+  
+eureka: 
+    instance: 
+        hostname: dingmk2.com
+        ipAddress: 192.168.101.15
+        instance-id: dingmk2.com:${server.port}
+        preferIpAddress: false
+    client: 
+        registerWithEureka: true
+        fetchRegistry: true
+        serviceUrl: 
+            defaultZone: http://dingmk1.com:8888/eureka
