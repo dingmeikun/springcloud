@@ -16,7 +16,7 @@ public class GateWayApplication {
 	
 	// 路由规则提供两种方式：1 可以是使用代码指定注入Bean(routeLocator)并且指定路由规则 2也可以是在配置文件application.yml中配置路由规则(推荐)
 	@Bean
-	private RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
+	public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
 				// 1.转发/jd/**开头的的请求，到http://jd.com:80/，其中断言部分就是predicates: - Path=/jd/**
 				.route("test_id", r -> r.path("/jd/**")
@@ -48,6 +48,4 @@ public class GateWayApplication {
 					.uri("http://localhost:8071/retry?key=abc&count=2"))
 				.build();
 	}
-	
-	
 }

@@ -10,8 +10,4 @@
 	</parent>
 	<artifactId>springcloud-gateway-simple</artifactId>
 	
-	<dependencies>
-
-	</dependencies>
-	
 </project>

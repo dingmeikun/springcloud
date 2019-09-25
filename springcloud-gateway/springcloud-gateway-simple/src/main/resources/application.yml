@@ -1,19 +1,20 @@
+spring: 
+   application: 
+      name: gateway-simple
+   cloud:
+      gateway:
+         discovery:
+            locator:
+               enabled: true
+               lowerCaseServiceId: true
+
 server: 
-   port: 8020
+   port: 8889 #网关服务监听 8889 端口
+
+eureka:
+   client:
+      service-url: #指定注册中心的地址，以便使用服务发现功能
+         defaultZone: http://localhost:8000/eureka/
 
 logging: 
     config: classpath:logback-spring.xml
-    
-spring: 
-   application: 
-        name: eureka-server
-   cloud:
-      gateway:
-         routes:
-          - id: test_id
-            uri: http://jd.com:80/
-            predicates: 
-            - Path=/jd/**
-            filters:
-
-            
