@@ -11,7 +11,7 @@
 	<name>spring-cloud-parent v2.0</name>
 	<description>
 		springcloud版本需要和springboot相匹配，最新的Finchley.RELEASE正式版只支持springboot 2.0.x以上，否则编译报错。
-		springcloud版本从A~F分别是:Angel、Brixton、Camden、Dalston、Edgware、Finchley，其中最新的Finchley版本兼容springboot2.x以上，不兼容1.5.x
+		springcloud版本从A~F分别是:Angel、Brixton、Camden、Dalston、Edgware、Finchley，其中最新的Finchley版本兼容springboot2.0.*，不兼容1.5.x以上和2.1.*以上
 		目前市场使用基数多的版本是D、E版本，但是也有很多升级到F版本，其中涉及到很多参数的变化，以及依赖项目的变化，详情可参考：
 		https://www.cnblogs.com/xingzc/p/9414208.html
 		https://www.jb51.net/article/146335.htm
@@ -20,7 +20,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.0.RELEASE</version>
+        <version>2.0.9.RELEASE</version>
         <relativePath/>
 	</parent>
 
@@ -30,7 +30,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 <!--         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version> --><!-- 可基于springboot2.0.x开发 -->
-        <spring-cloud.version>Finchley.SR2</spring-cloud.version><!-- 可基于springboot1.5.x开发，或小于2.0.0 -->
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version><!-- 可基于springboot1.5.x开发，或小于2.0.0 -->
         <maven-scm-plugin.version>1.9.5</maven-scm-plugin.version>
         <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
 	</properties>
