@@ -13,29 +13,31 @@
 	
 	<modules>
 		<module>springcloud-gateway-simple</module>
+		<module>springcloud-gateway-server</module>
     </modules>
+    
+    <dependencies>
+    	<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+    </dependencies>
 	
-	<dependencies>
-		<dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-starter-gateway</artifactId>
-		</dependency>
-		<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-        
-        <dependency>
-		    <groupId>org.springframework.retry</groupId>
-		    <artifactId>spring-retry</artifactId>
-		</dependency>
-	</dependencies>
-		
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>springcloud-gateway-simple</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-gateway-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			
