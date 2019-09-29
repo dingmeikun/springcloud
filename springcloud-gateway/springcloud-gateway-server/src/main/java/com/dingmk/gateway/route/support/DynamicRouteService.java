@@ -1,62 +1,61 @@
 package com.dingmk.gateway.route.support;
 
-import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
-import org.springframework.cloud.gateway.filter.FilterDefinition;
-import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
-import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dingmk.gateway.route.dao.DynamicRouteRepository;
+import com.dingmk.gateway.route.consts.DynamicRouteConsts;
+import com.dingmk.gateway.route.dao.DynamicRouteDBRepository;
 import com.dingmk.gateway.route.dto.CustomGatewayRoutes;
 import com.dingmk.gateway.route.dto.CustomPageResult;
 import com.dingmk.gateway.route.dto.GatewayRoutesVO;
 import com.dingmk.gateway.route.model.CustomFilterDefinition;
 import com.dingmk.gateway.route.model.CustomPredicateDefinition;
 import com.dingmk.gateway.route.model.CustomRouteDefinition;
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.xy.onlineteam.integration.cache.core.XyCache;
+import com.xy.onlineteam.integration.cache.core.XyCacheManager;
 
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
 public class DynamicRouteService implements ApplicationEventPublisherAware, IDynamicRouteService {
 
-	public static final String GATEWAY_ROUTES_PREFIX = "GETEWAY_ROUTES";
+	private static SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	@Autowired
-	private StringRedisTemplate redisTemplate;
+	private XyCache xyCache;
 
+	@Autowired
+	private XyCacheManager cacheManager;
+
+	@PostConstruct
+	public void postConstruct() {
+		xyCache = cacheManager.getXyCache(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX);
+	}
+	
 	@Resource
 	private RouteDefinitionWriter routeDefinitionWriter;
 
 	@Resource
-	private DynamicRouteRepository routeRepository;
+	private DynamicRouteDBRepository routeRepository;
 
 	private ApplicationEventPublisher publisher;
 
@@ -81,16 +80,17 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     @Override
     public String add(CustomRouteDefinition gatewayRouteDefinition) {
         CustomGatewayRoutes CustomGatewayRoutes = transformToCustomGatewayRoutes(gatewayRouteDefinition);
-        CustomGatewayRoutes.setDelFlag(0);
-        CustomGatewayRoutes.setCreateTime(new Date());
-        CustomGatewayRoutes.setUpdateTime(new Date());
-        routeRepository.insertSelective(CustomGatewayRoutes);
+        CustomGatewayRoutes.setStatus(1);
+        Date now = new Date();
+        CustomGatewayRoutes.setCreateTime(timeFormat.format(now));
+        CustomGatewayRoutes.setUpdateTime(timeFormat.format(now));
+        routeRepository.insert(CustomGatewayRoutes);
 
-        gatewayRouteDefinition.setId(CustomGatewayRoutes.getId());
+        gatewayRouteDefinition.setId(CustomGatewayRoutes.getRouteId());
        
-        redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).put(gatewayRouteDefinition.getId(),  JSONObject.toJSONString(gatewayRouteDefinition));
+        xyCache.hset(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, gatewayRouteDefinition.getId(), JSONObject.toJSONString(gatewayRouteDefinition));
         
-        return CustomGatewayRoutes.getId();
+        return CustomGatewayRoutes.getRouteId();
     }
 
     /**
@@ -102,15 +102,10 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     @Override
     public String update(CustomRouteDefinition gatewayRouteDefinition) {
         CustomGatewayRoutes CustomGatewayRoutes = transformToCustomGatewayRoutes(gatewayRouteDefinition);
-        CustomGatewayRoutes.setCreateTime(new Date());
-        CustomGatewayRoutes.setUpdateTime(new Date());
-        routeRepository.updateByPrimaryKeySelective(CustomGatewayRoutes);
+        CustomGatewayRoutes.setUpdateTime(timeFormat.format(new Date()));
+        routeRepository.updateByPrimaryKey(CustomGatewayRoutes);
 
-        
-    	redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).delete(gatewayRouteDefinition.getId()); 
-        
-        redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).put(gatewayRouteDefinition.getId(),  JSONObject.toJSONString(gatewayRouteDefinition));
-        
+        xyCache.hset(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, gatewayRouteDefinition.getId(), JSONObject.toJSONString(gatewayRouteDefinition));
         
         return gatewayRouteDefinition.getId();
     }
@@ -124,17 +119,9 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     @Override
     public String delete(String id) {
     	routeRepository.deleteByPrimaryKey(id);
-        redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).delete( id ); 
+    	xyCache.hdel(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, id);
         
         return "success";
-//        try {
-//            this.routeDefinitionWriter.delete(Mono.just(id));
-//            notifyChanged();
-//            return "delete success";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "delete fail";
-//        }
     }
 
     /**
@@ -145,12 +132,12 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     @Override
     public CustomPageResult<GatewayRoutesVO> findAll(Map<String, Object> params) {
         PageHelper.startPage(MapUtils.getInteger(params, "page"),MapUtils.getInteger(params, "limit"),true);
-        List<CustomGatewayRoutes> alls = routeRepository.findAll(new HashMap());
+        List<CustomGatewayRoutes> alls = routeRepository.findAllRoutes();
         
         List<GatewayRoutesVO> routesVO = new ArrayList<GatewayRoutesVO>(alls.size());
         alls.stream().forEach(route -> { // CustomGatewayRoutes -> GatewayRoutesVO
         	GatewayRoutesVO vo = new GatewayRoutesVO();
-        	vo.setId(route.getId());
+        	vo.setId(route.getRouteId());
         	// 属性拷贝
         	routesVO.add(vo);
         });
@@ -163,15 +150,13 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
      */
     @Override
     public String synchronization() {
-        HashMap map = new HashMap();
-        map.put("delFlag", 0);
-        List<CustomGatewayRoutes> alls = routeRepository.findAll(map);
+        List<CustomGatewayRoutes> alls = routeRepository.findAllRoutes();
 
         for (CustomGatewayRoutes route : alls) {
         	CustomRouteDefinition gatewayRouteDefinition = CustomRouteDefinition.builder()
                     .description(route.getDescription())
-                    .id(route.getId())
-                    .order(route.getOrder())
+                    .id(route.getRouteId())
+                    .order(route.getOrders())
                     .uri(route.getUri())
                     .build();
 
@@ -180,7 +165,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
             gatewayRouteDefinition.setPredicates(gatewayPredicateDefinitions);
             gatewayRouteDefinition.setFilters(gatewayFilterDefinitions);
 
-            redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).put( route.getId() ,  JSONObject.toJSONString(gatewayRouteDefinition));
+            xyCache.hset(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, route.getRouteId(), JSONObject.toJSONString(gatewayRouteDefinition));
         }
 
         return "success";
@@ -203,13 +188,13 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
         }
 
         if (flag == 1){
-            redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).delete( id ); 
+        	xyCache.hdel(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, id);
             
         }else {
         	CustomRouteDefinition gatewayRouteDefinition = CustomRouteDefinition.builder()
                     .description(CustomGatewayRoutes.getDescription())
-                    .id(CustomGatewayRoutes.getId())
-                    .order(CustomGatewayRoutes.getOrder())
+                    .id(CustomGatewayRoutes.getRouteId())
+                    .order(CustomGatewayRoutes.getOrders())
                     .uri(CustomGatewayRoutes.getUri())
                     .build();
 
@@ -218,13 +203,12 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
             gatewayRouteDefinition.setPredicates(gatewayPredicateDefinitions);
             gatewayRouteDefinition.setFilters(gatewayFilterDefinitions);
 
-            redisTemplate.boundHashOps(GATEWAY_ROUTES_PREFIX).put( CustomGatewayRoutes.getId() ,  JSONObject.toJSONString(gatewayRouteDefinition));
-            
+            xyCache.hset(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, CustomGatewayRoutes.getRouteId(), JSONObject.toJSONString(gatewayRouteDefinition));
         }
 
-        CustomGatewayRoutes.setDelFlag(flag);
-        CustomGatewayRoutes.setUpdateTime(new Date());
-        int i = routeRepository.updateByPrimaryKeySelective(CustomGatewayRoutes);
+        CustomGatewayRoutes.setStatus(flag);
+        CustomGatewayRoutes.setUpdateTime(timeFormat.format(new Date()));
+        int i = routeRepository.updateByPrimaryKey(CustomGatewayRoutes);
         return i > 0 ? "更新成功": "更新失败";
     }
 
@@ -236,9 +220,9 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     private CustomGatewayRoutes transformToCustomGatewayRoutes(CustomRouteDefinition customRouteDefinition){
         CustomGatewayRoutes customGatewayRoutes = new CustomGatewayRoutes();
         
-        //设置路由id
-        if (!StringUtils.isNotBlank(customGatewayRoutes.getId())){
-        	customGatewayRoutes.setId(java.util.UUID.randomUUID().toString().toUpperCase().replace("-",""));
+        customGatewayRoutes.setRouteId(customRouteDefinition.getId());
+        if (!StringUtils.isNotBlank(customRouteDefinition.getId())){
+        	customGatewayRoutes.setRouteId(java.util.UUID.randomUUID().toString().toUpperCase().replace("-",""));
         }
 
         String filters = JSONArray.toJSONString(customRouteDefinition.getFilters());
@@ -247,44 +231,10 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
         customGatewayRoutes.setFilters(filters);
         customGatewayRoutes.setPredicates(predicates);
         customGatewayRoutes.setUri(customRouteDefinition.getUri());
-        customGatewayRoutes.setOrder(customRouteDefinition.getOrder());
+        customGatewayRoutes.setOrders(customRouteDefinition.getOrder());
         customGatewayRoutes.setDescription(customRouteDefinition.getDescription());
-
+        
         return customGatewayRoutes;
-    }
-
-    /**
-     * 测试方法 新建 一个路由
-     */
-//    @PostConstruct
-    public void main() {
-        RouteDefinition definition = new RouteDefinition();
-        definition.setId("jd");
-        URI uri = UriComponentsBuilder.fromUriString("lb://user-center").build().toUri();
-//         URI uri = UriComponentsBuilder.fromHttpUrl("http://baidu.com").build().toUri();
-        definition.setUri(uri);
-        definition.setOrder(11111);
-
-        //定义第一个断言
-        PredicateDefinition predicate = new PredicateDefinition();
-        predicate.setName("Path");
-
-        Map<String, String> predicateParams = new HashMap<>(8);
-        predicateParams.put("pattern", "/jd/**");
-        predicate.setArgs(predicateParams);
-        //定义Filter
-        FilterDefinition filter = new FilterDefinition();
-        filter.setName("StripPrefix");
-        Map<String, String> filterParams = new HashMap<>(8);
-        //该_genkey_前缀是固定的，见org.springframework.cloud.gateway.support.NameUtils类
-        filterParams.put("_genkey_0", "1");
-        filter.setArgs(filterParams);
-
-        definition.setFilters(Arrays.asList(filter));
-        definition.setPredicates(Arrays.asList(predicate));
-
-        System.out.println("definition:" + JSON.toJSONString(definition));
-        redisTemplate.opsForHash().put(GATEWAY_ROUTES_PREFIX, "key", JSON.toJSONString(definition));
     }
 
 	/**

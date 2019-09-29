@@ -1,0 +1,29 @@
+server: 
+   port: 9706
+   
+logging: 
+   config: classpath:logback-spring.xml
+
+eureka:
+   client:
+      service-url: #指定注册中心的地址，以便使用服务发现功能
+         defaultZone: http://localhost:8000/eureka/
+
+spring: 
+   application: 
+      name: gateway-server
+   cloud:
+      gateway:
+         discovery:
+            locator:
+               enabled: true
+               lowerCaseServiceId: true
+
+#开启端点
+management:
+   endpoints:
+      web:
+         exposure:
+            include: '*'
+   security:
+      enabled: false

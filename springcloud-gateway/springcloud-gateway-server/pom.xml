@@ -28,28 +28,36 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
-		<!--基于 reactive stream 的redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
-		</dependency>
 		<!-- mybatis的分页插件 -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-		<!-- mybatis-plus -->
-		<dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.0.6</version>
-        </dependency>
 		
+		<!-- Disconf自从springboot 2.*以后，就不能使用原生的方式支持了，因为新版的disconf去除了一个方法：parseStringvalue()导致不能启动，需要额外重写reloadproperties方法 
+			详情参考文章：https://blog.csdn.net/ai_xao/article/details/86525196 -->
 		<dependency>
        		<groupId>com.dingmk.learn</groupId>
     		<artifactId>tim-database</artifactId>
 			<version>1.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.dingmk.learn</groupId>
+					<artifactId>tim-disconf</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.xy.onlineteam</groupId>
+			<artifactId>xy-configuration-cache-redis</artifactId>
+			<version>${xy-framework.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.xy.onlineteam</groupId>
+					<artifactId>xy-disconf</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -68,6 +76,12 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.baidu.disconf</groupId>
+		    <artifactId>disconf-client</artifactId>
+		    <version>2.6.36</version>
 		</dependency>
 	</dependencies>
 </project>

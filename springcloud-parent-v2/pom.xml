@@ -33,6 +33,7 @@
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version><!-- 可基于springboot1.5.x开发，或小于2.0.0 -->
         <maven-scm-plugin.version>1.9.5</maven-scm-plugin.version>
         <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
+        <xy-framework.version>3.2.9</xy-framework.version>
 	</properties>
 	
 	<dependencies>

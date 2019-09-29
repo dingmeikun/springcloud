@@ -1,16 +1,14 @@
 package com.dingmk.gateway.route.dto;
 
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class CustomGatewayRoutes {
-
+	
 	/** 路由ID */
-	private String id;
+	private String routeId;
 	
 	/** uri路径 */
     private String uri;
@@ -22,17 +20,17 @@ public class CustomGatewayRoutes {
     private String filters;
     
     /** 排序 */
-    private Integer order;
+    private Integer orders;
     
     /** 描述 */
     private String description;
     
-    /** 删除标志 0不删除，1删除 */
-    private Integer delFlag;
+    /** 状态:1 启用状态、0 失效状态  */
+    private Integer status;
     
     /** 创建时间 */
-    private Date createTime;
+    private String createTime;
     
     /** 更新时间 */
-    private Date updateTime;
+    private String updateTime;
 }
