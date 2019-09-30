@@ -1,0 +1,27 @@
+server: 
+   port: 9709
+   
+logging: 
+   config: classpath:logback-spring.xml
+
+eureka:
+   client:
+      service-url: #指定注册中心的地址，以便使用服务发现功能
+         defaultZone: http://localhost:8000/eureka/
+
+spring: 
+   application: 
+      name: zipkin-zuul
+   zipkin:
+      base-url: http://localhost:9707
+   sleuth:
+      sampler:
+         percentage: 1.0
+         
+zuul:
+   # servlet-path: / # 自定义filter时，需要加上这个自定义路径，标识着会有本地的过滤器需要加载
+   # prefix: /data # 添加前缀，真实访问时将会去除这个前缀进行访问：加上：http://192.168.101.15:8009/data/service/zuul/v1，去除：http://192.168.101.15:8009/service/zuul/v1
+   routes:
+      zipkin-service:
+         path: /v1/** # 匹配/service/后面的多级uri，表达式有(1):/service/** 多级/A/B/CC/CCC,(2):/service/* 单级/A /B /CC /CCC,(3):/service/? 单字符/A /B /C /D 注：/A 为zull-simple的服务uri
+         serviceId: zipkin-service
