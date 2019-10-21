@@ -1,6 +1,5 @@
 package com.dingmk.gateway.route.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -27,12 +26,12 @@ public class CustomRouteDefinition {
     /**
      * 	路由断言集合配置
      */
-    private List<CustomPredicateDefinition> predicates = new ArrayList<>();
+    private List<CustomPredicateDefinition> predicates;
 
     /**
      *	 路由过滤器集合配置
      */
-    private List<CustomFilterDefinition> filters = new ArrayList<>();
+    private List<CustomFilterDefinition> filters;
 
     /**
      *	 路由规则转发的目标uri
@@ -42,7 +41,7 @@ public class CustomRouteDefinition {
     /**
      *	 路由执行的顺序
      */
-    private int order = 0;
+    private int order;
     
     /**
      * 	路由描述

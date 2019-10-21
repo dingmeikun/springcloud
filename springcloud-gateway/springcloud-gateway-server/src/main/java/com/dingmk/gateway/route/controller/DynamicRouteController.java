@@ -27,15 +27,20 @@ public class DynamicRouteController {
 	
 	/**
      * 增加路由
-     * @param gwdefinition
+     * @param definition
      * @return
      */
     @PostMapping("/add")
-    public BasicLogicResult<String> add(@RequestBody CustomRouteDefinition gwdefinition) {
-    	String route_id = dynamicRouteService.add(gwdefinition);
+    public BasicLogicResult<String> add(@RequestBody CustomRouteDefinition definition) {
+    	String route_id = dynamicRouteService.add(definition);
     	return new BasicLogicResult<String>(1, "add id OK", route_id);
     }
     
+    /**
+     * 修改路由
+     * @param definition
+     * @return
+     */
     @PostMapping("/update")
     public BasicLogicResult<String> update(@RequestBody CustomRouteDefinition definition) {
         String route_id = dynamicRouteService.update(definition);

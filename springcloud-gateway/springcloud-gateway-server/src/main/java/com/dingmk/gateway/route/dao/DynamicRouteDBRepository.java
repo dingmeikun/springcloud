@@ -50,7 +50,7 @@ public class DynamicRouteDBRepository {
 	}
 
     public int insert(CustomGatewayRoutes routes) {
-    	// validateRoutes(routes);
+    	 validateRoutes(routes);
     	
     	Object[] parametes = new Object[] { routes.getRouteId(), routes.getUri(), routes.getPredicates(), routes.getFilters(), routes.getOrders(),
     			routes.getDescription(), routes.getStatus(), routes.getCreateTime()};

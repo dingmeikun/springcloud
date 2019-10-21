@@ -10,8 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,7 +42,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
 	
 	private XyCache xyCache;
 
-	@Autowired
+	@Resource
 	private XyCacheManager cacheManager;
 
 	@PostConstruct
@@ -73,6 +72,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
 
 	/**
      * 新增路由
+     * 新增规则：1增加DB路由  2增加缓存路由
      *
      * @param gatewayRouteDefinition
      * @return
@@ -94,7 +94,8 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     }
 
     /**
-     * 修改路由
+     * 	修改路由
+     * 	修改规则：1 淘汰缓存路由  2修改DB路由
      *
      * @param gatewayRouteDefinition
      * @return
@@ -103,29 +104,31 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     public String update(CustomRouteDefinition gatewayRouteDefinition) {
         CustomGatewayRoutes CustomGatewayRoutes = transformToCustomGatewayRoutes(gatewayRouteDefinition);
         CustomGatewayRoutes.setUpdateTime(timeFormat.format(new Date()));
+        xyCache.hdel(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, gatewayRouteDefinition.getId());
+        
         routeRepository.updateByPrimaryKey(CustomGatewayRoutes);
-
-        xyCache.hset(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, gatewayRouteDefinition.getId(), JSONObject.toJSONString(gatewayRouteDefinition));
         
         return gatewayRouteDefinition.getId();
     }
 
 
     /**
-     * 删除路由
-     * @param id
+     *	删除路由
+     *	删除规则：1删除DB路由   2删除缓存路由
+     *
+     * @param 路由routeId
      * @return
      */
     @Override
-    public String delete(String id) {
-    	routeRepository.deleteByPrimaryKey(id);
-    	xyCache.hdel(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, id);
+    public String delete(String routeId) {
+    	routeRepository.deleteByPrimaryKey(routeId);
+    	xyCache.hdel(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX, routeId);
         
         return "success";
     }
 
     /**
-     * 查询全部数据
+     * 	查询全部数据
      *
      * @return
      */
@@ -139,6 +142,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
         	GatewayRoutesVO vo = new GatewayRoutesVO();
         	vo.setId(route.getRouteId());
         	// 属性拷贝
+        	// TODO 
         	routesVO.add(vo);
         });
         PageInfo<GatewayRoutesVO> pageInfo = new PageInfo<>(routesVO);
@@ -146,6 +150,9 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     }
 
     /**
+     * 手工同步路由 
+     * 同步规则：DB -> Redis
+     * 
      * @return
      */
     @Override
@@ -172,8 +179,8 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     }
 
     /**
-     * 更改路由状态
-     *
+     * 上线/下线路由
+     * 状态:1 启用状态(上线)  0 失效状态(下线)
      * @param params
      * @return
      */
@@ -213,7 +220,9 @@ public class DynamicRouteService implements ApplicationEventPublisherAware, IDyn
     }
 
     /**
-     * 转化路由对象  CustomGatewayRoutes
+     *	 转化路由对象  
+     *	CustomGatewayRoutes -> CustomGatewayRoutes
+     *
      * @param gatewayRouteDefinition
      * @return
      */

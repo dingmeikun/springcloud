@@ -14,6 +14,7 @@
 	<modules>
 		<module>springcloud-gateway-simple</module>
 		<module>springcloud-gateway-server</module>
+		<module>springcloud-gateway-ratelimit</module>
     </modules>
     
     <dependencies>
@@ -38,6 +39,11 @@
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>springcloud-gateway-server</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>springcloud-gateway-ratelimit</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			
