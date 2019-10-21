@@ -1,3 +1,6 @@
+server:
+    port: 9706
+
 ---
 # eureka注册中心配置
 eureka:
@@ -27,8 +30,6 @@ management:
                 include: '*'
     security:
         enabled: false
-server:
-    port: 9706
 
 --- 
 # gateway配置

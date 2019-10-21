@@ -1,5 +1,6 @@
 package com.dingmk.gateway.route.support;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,19 +10,22 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache.ValueRetrievalException;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.dingmk.comm.utils.JsonMapper;
+import com.dingmk.gateway.route.common.BasicModelConfig;
 import com.dingmk.gateway.route.consts.DynamicRouteConsts;
 import com.dingmk.gateway.route.dao.DynamicRouteDBRepository;
+import com.dingmk.gateway.route.dto.CustomGatewayRoutes;
+import com.dingmk.gateway.route.model.CustomRouteDefinition;
+import com.dingmk.gateway.route.utils.CommonUtil;
+import com.dingmk.redis.XyJedis;
+import com.dingmk.redis.XyJedisPool;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.xy.onlineteam.configuration.redis.XyJedis;
-import com.xy.onlineteam.configuration.redis.XyJedisPool;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -31,37 +35,41 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class DynamicDefinitionRepository implements RouteDefinitionRepository {
 
+	private static volatile boolean isCacheHit;
+	
 	@Resource
 	private DynamicRouteDBRepository routeRepository;
 
 	@Resource
+	private BasicModelConfig baseConfig;
+	
+	@Resource
     private XyJedisPool jedisPool;
 
 	/** 缓存过期时间 */
-	@Value("${spring.data.cache.expire:30}")
-	private int expire_time;
+	@Value("${gateway.local.cache.expire}")
+	private int expire;
 
 	/** 缓存初始大小 */
-	@Value("${spring.data.cache.capacity:1}")
-	private int max_numsize;
-
-	private Cache<String, Map<String, RouteDefinition>> localcache = CacheBuilder.newBuilder().maximumSize(max_numsize)
-			.expireAfterWrite(expire_time, TimeUnit.SECONDS).build();
-
+	@Value("${gateway.local.cache.capacity}")
+	private int capacity;
+	
+	/**
+	 * <b> BUG 指定size和expire不生效  </b>
+	 */
+	private Cache<String, Map<String, RouteDefinition>> cache = CacheBuilder.newBuilder()
+            .initialCapacity(10).expireAfterWrite(60, TimeUnit.SECONDS).build();
+	
 	/**
 	 * 获取全部路由
-	 * 
-	 * 实现过程： 
-	 * 1.使用本地缓存，google的guava的本地cache，可以设置过期时间(1分钟清理一次/1分钟过期)
-	 * 2.本方法中，先拿cache，如果为空，则从redis中获取，为空则再从DB中获取，再塞到本地缓存中 
-	 * 3.记得在update/add的地方清空本地缓存？update/delete/add时，需要保证redis和db的强一致性！
+	 * <b>使用v2缓存框架：先获取本地缓存，拿不到再获取redis缓存，还获取不到就回调获取DB路由信息(框架层设置回缓存)</b>
 	 * 
 	 * @return
 	 */
 	@Override
 	public Flux<RouteDefinition> getRouteDefinitions() {
 		try {
-			Map<String, RouteDefinition> cacheRoutes = localcache.get(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX,
+			Map<String, RouteDefinition> cacheRoutes = cache.get(DynamicRouteConsts.L_GATEWAY_ROUTES_HASH_KEY,
 					new Callable<Map<String, RouteDefinition>>() {
 
 						@Override
@@ -69,80 +77,91 @@ public class DynamicDefinitionRepository implements RouteDefinitionRepository {
 							
 							Map<String, RouteDefinition> storeRoutes = new HashMap<String, RouteDefinition>();
 							try (XyJedis jedis = jedisPool.getResource()) {
-								Map<String, String> routes = jedis.hgetAll(DynamicRouteConsts.GATEWAY_ROUTES_SUFFIX);
+								Map<String, String> routes = jedis.hgetAll(DynamicRouteConsts.GATEWAY_ROUTES_HASH_KEY);
 								
 								routes.forEach((routeId, route) -> {
 									if (null != routeId && !routeId.isEmpty() && null != route) {
-										RouteDefinition routeDefinition = JSONObject.parseObject(routes.get(routeId),
-												RouteDefinition.class);
-										if (null != routeDefinition) {
-											storeRoutes.put(routeId, routeDefinition);
+										CustomRouteDefinition customRoute = JsonMapper.nonDefaultMapper().fromJson(route, CustomRouteDefinition.class);
+										if (null != customRoute && customRoute.valide()) {
+											RouteDefinition routeDefinition = CommonUtil.convertToRouteDefinition(customRoute);
+											if (null != routeDefinition) {
+												storeRoutes.put(routeId, routeDefinition);
+											}
 										}
 									}
 								});
 					        } catch (Exception e) {
 					        	log.error("XYJEDIS_MEET_EXCEPTION:", e.getMessage(), e);
 							}
+							isCacheHit = false;
 							return storeRoutes;
 						}
 					});
 
 			if (CollectionUtils.isEmpty(cacheRoutes)) {
-				List<RouteDefinition> dbRoutes = routeRepository.findAllRouteDefinition();
-				if (CollectionUtils.isEmpty(dbRoutes)) {
+				Map<String, RouteDefinition> dbMapRoutes = queryDBRoutesInfo();
+				if (CollectionUtils.isEmpty(dbMapRoutes)) {
 					return Flux.empty();
 				}
 
-				Map<String, RouteDefinition> dbMapRoutes = new HashMap<String, RouteDefinition>();
-				dbRoutes.stream().forEach(route -> {
-					if (null != route && null != route.getId() && !route.getId().isEmpty()) {
-						dbMapRoutes.put(route.getId(), route);
-					}
-				});
-
-				localcache.put(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX, dbMapRoutes);
-				return Flux.fromIterable(dbRoutes);
+				putCache(dbMapRoutes);
+				return Flux.fromIterable(dbMapRoutes.values());
 			}
 
+			if (!isCacheHit) {
+				putCache(cacheRoutes);
+			}
+			
 			return Flux.fromIterable(cacheRoutes.values());
-		} catch (ValueRetrievalException e) {
-			log.error("ROUTES_DEFINITIONS_MEET_VALUE_RETRIEVAL_EXCEPTION:{}", e.getMessage(), e);
-			throw e;
 		} catch (Exception e) {
 			log.error("ROUTES_DEFINITIONS_EXCEPTION:{}", e.getMessage(), e);
-			List<RouteDefinition> routes = routeRepository.findAllRouteDefinition();
-
-			Map<String, RouteDefinition> dbMapRoutes = new HashMap<String, RouteDefinition>();
-			routes.stream().forEach(route -> {
-				if (null != route && null != route.getId() && !route.getId().isEmpty()) {
-					dbMapRoutes.put(route.getId(), route);
-				}
-			});
-
+			
+			Map<String, RouteDefinition> dbMapRoutes = queryDBRoutesInfo();
 			if (CollectionUtils.isEmpty(dbMapRoutes)) {
 				return Flux.empty();
 			}
 
-			localcache.put(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX, dbMapRoutes);
+			putCache(dbMapRoutes);
 			return Flux.fromIterable(dbMapRoutes.values());
+		} finally {
+			isCacheHit = true;
 		}
+	}
+	
+	private void putCache(Map<String, RouteDefinition> cacheValue) {
+		cache.put(DynamicRouteConsts.L_GATEWAY_ROUTES_HASH_KEY, cacheValue);
+	}
+	
+	private Map<String, RouteDefinition> queryDBRoutesInfo() {
+		Map<String, RouteDefinition> dbMapRoutes = new HashMap<String, RouteDefinition>();
+		
+		if (baseConfig.getGlobalLimiter().tryAcquire()) {
+			List<CustomGatewayRoutes> dbRoutes = routeRepository.findAllRoutes();
+			if (CollectionUtils.isEmpty(dbRoutes)) {
+				return Collections.emptyMap();
+			}
+			
+			List<RouteDefinition> definition = CommonUtil.convertToRouteDefinitionList(dbRoutes);
+			definition.stream().forEach(route -> {
+				if (null != route && null != route.getId() && !route.getId().isEmpty()) {
+					dbMapRoutes.put(route.getId(), route);
+				}
+			});
+		}
+		
+		return dbMapRoutes;
 	}
 
 	/**
 	 * 添加路由方法
+	 * <b>已实现路由存储和读取，默认方法返回默认empty</b>
 	 * 
 	 * @param route
 	 * @return
 	 */
 	@Override
 	public Mono<Void> save(Mono<RouteDefinition> route) {
-		return route.flatMap(routeDefinition -> {
-			if (null != routeDefinition) {
-				localcache.getIfPresent(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX).put(routeDefinition.getId(),
-						routeDefinition);
-			}
-			return Mono.empty();
-		});
+		return Mono.empty();
 	}
 
 	/**
@@ -153,11 +172,6 @@ public class DynamicDefinitionRepository implements RouteDefinitionRepository {
 	 */
 	@Override
 	public Mono<Void> delete(Mono<String> routeId) {
-		return routeId.flatMap(routid -> {
-			if (null != routid && !(routid = routid.trim()).isEmpty()) {
-				localcache.getIfPresent(DynamicRouteConsts.GATEWAY_ROUTES_PREFIX).remove(routid);
-			}
-			return Mono.empty();
-		});
+		return Mono.empty();
 	}
 }

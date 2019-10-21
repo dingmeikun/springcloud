@@ -1,8 +1,13 @@
 package com.dingmk.gateway.route.consts;
 
 public class DynamicRouteConsts {
-
-	public static final String GATEWAY_ROUTES_PREFIX = "GETEWAY_ROUTES";
 	
-	public static final String GATEWAY_ROUTES_SUFFIX = "HASH_KEY";
+	/** Redis Hash Key */
+	public static final String GATEWAY_ROUTES_HASH_KEY = "GW_ROUTES_HASH_KEY";
+	
+	/** Local Cache Key */
+	public static final String L_GATEWAY_ROUTES_HASH_KEY = "LC_" + GATEWAY_ROUTES_HASH_KEY;
+	
+	/** Routes create data format */
+	public static final String GATEWAY_ROUTES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }

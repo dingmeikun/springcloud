@@ -1,8 +1,7 @@
 package com.dingmk.gateway.route.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,29 +10,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dingmk.gateway.route.common.BasicLogicResult;
-import com.dingmk.gateway.route.dto.CustomPageResult;
-import com.dingmk.gateway.route.dto.GatewayRoutesVO;
 import com.dingmk.gateway.route.model.CustomRouteDefinition;
 import com.dingmk.gateway.route.support.DynamicRouteService;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
-@RequestMapping("/route")
+@RequestMapping("/gateway")
 public class DynamicRouteController {
-
+	
 	@Autowired
     private DynamicRouteService dynamicRouteService;
 	
 	/**
      * 增加路由
-     * @param definition
+     * @param
      * @return
      */
-    @PostMapping("/add")
-    public BasicLogicResult<String> add(@RequestBody CustomRouteDefinition definition) {
-    	String route_id = dynamicRouteService.add(definition);
-    	return new BasicLogicResult<String>(1, "add id OK", route_id);
+    @PostMapping("/route/add")
+    public BasicLogicResult<String> add(@RequestBody CustomRouteDefinition request) {
+    	if (log.isDebugEnabled()) {
+    		log.debug("Gateway[ADD] 请求参数：{}", JSONObject.toJSONString(request));
+    	}
+    	
+    	BasicLogicResult<String> response = dynamicRouteService.add(request);
+    	
+    	if (log.isDebugEnabled()) {
+            log.debug("Gateway[ADD] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+    	return response;
     }
     
     /**
@@ -41,36 +49,88 @@ public class DynamicRouteController {
      * @param definition
      * @return
      */
-    @PostMapping("/update")
-    public BasicLogicResult<String> update(@RequestBody CustomRouteDefinition definition) {
-        String route_id = dynamicRouteService.update(definition);
-        return new BasicLogicResult<String>(1, "update id OK", route_id);
+    @PostMapping("/route/update")
+    public BasicLogicResult<String> update(@RequestBody CustomRouteDefinition request) {
+    	if (log.isDebugEnabled()) {
+    		log.debug("Gateway[UPDATE] 请求参数：{}", JSONObject.toJSONString(request));
+    	}
+    	
+    	BasicLogicResult<String> response = dynamicRouteService.update(request);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Gateway[UPDATE] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+        return response;
     }
 
-    @GetMapping("/delete/{id}")
-    public BasicLogicResult<String> delete(@PathVariable String id) {
-        String route_id = dynamicRouteService.delete(id);
-        return new BasicLogicResult<String>(1, "delete id OK", route_id);
+    /**
+     * 删除路由
+     * @param RouteId
+     * @return
+     */
+    @DeleteMapping("/route/delete/{routeId}")
+    public BasicLogicResult<String> delete(@PathVariable("routeId") String routeId) {
+    	if (log.isDebugEnabled()) {
+    		log.debug("Gateway[DELETE] 请求参数：{}", routeId);
+    	}
+    	
+    	BasicLogicResult<String> response = dynamicRouteService.delete(routeId);
+        
+    	if (log.isDebugEnabled()) {
+            log.debug("Gateway[DELETE] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+        return response;
     }
     
-    //获取全部数据
-    @GetMapping("/findAll")
-    public CustomPageResult<GatewayRoutesVO> findAll(@RequestParam Map<String, Object> params){
-        return dynamicRouteService.findAll(params);
+    /**
+     * 同步路由（db ->redis）
+     * @return
+     */
+    @GetMapping("/route/sync")
+    public BasicLogicResult<String> syncRoutes() {
+    	BasicLogicResult<String> response = dynamicRouteService.synchronization();
+    	
+    	if (log.isDebugEnabled()) {
+            log.debug("Gateway[SYNC] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+    	return response;
     }
-
-    //同步redis数据 从mysql中同步过去
-    @GetMapping("/synchronization")
-    public BasicLogicResult<String> synchronization() {
-    	String status = dynamicRouteService.synchronization();
-    	return new BasicLogicResult<String>(1, "sync id OK", status);
+    
+    /**
+     * 上线路由
+     * @param
+     * @return
+     */
+    @GetMapping("/route/online")
+    public BasicLogicResult<String> onlineRoute(@RequestParam("routeId") String routeId, @RequestParam("status") int status) {
+    	if (log.isDebugEnabled()) {
+    		log.debug("Gateway[ONLINE] 请求参数：routeId [{}], status [{}]", routeId, status);
+    	}
+    	
+    	BasicLogicResult<String> response = dynamicRouteService.online(routeId, status);
+    	
+    	if (log.isDebugEnabled()) {
+            log.debug("Gateway[ONLINE] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+    	return response;
     }
-
-
-    //修改路由状态
-    @GetMapping("/updateFlag")
-    public BasicLogicResult<String> updateFlag(@RequestParam Map<String, Object> params) {
-    	String status = dynamicRouteService.updateFlag(params);
-    	return new BasicLogicResult<String>(1, "update Flag OK", status);
+    
+    /**
+     * 下线路由
+     * @param
+     * @return
+     */
+    @GetMapping("/route/offline")
+    public BasicLogicResult<String> offlineRoute(@RequestParam("routeId") String routeId, @RequestParam("status") int status) {
+    	if (log.isDebugEnabled()) {
+    		log.debug("Gateway[OFFLINE] 请求参数：routeId [{}], status [{}]", routeId, status);
+    	}
+    	
+    	BasicLogicResult<String> response = dynamicRouteService.offline(routeId, status);
+    	
+    	if (log.isDebugEnabled()) {
+            log.debug("Gateway[OFFLINE] 响应参数：{}", JSONObject.toJSONString(response));
+        }
+    	return response;
     }
 }

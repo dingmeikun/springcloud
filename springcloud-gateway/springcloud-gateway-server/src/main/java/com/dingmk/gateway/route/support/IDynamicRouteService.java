@@ -1,9 +1,6 @@
 package com.dingmk.gateway.route.support;
 
-import java.util.Map;
-
-import com.dingmk.gateway.route.dto.CustomPageResult;
-import com.dingmk.gateway.route.dto.GatewayRoutesVO;
+import com.dingmk.gateway.route.common.BasicLogicResult;
 import com.dingmk.gateway.route.model.CustomRouteDefinition;
 
 /**
@@ -16,45 +13,40 @@ public interface IDynamicRouteService {
      * @param gatewayRouteDefinition
      * @return
      */
-    String add(CustomRouteDefinition gatewayRouteDefinition);
+	BasicLogicResult<String> add(CustomRouteDefinition gatewayRouteDefinition);
 
     /**
      * 修改路由
       * @param gatewayRouteDefinition
      * @return
      */
-    String update(CustomRouteDefinition gatewayRouteDefinition);
-
-
+	BasicLogicResult<String> update(CustomRouteDefinition gatewayRouteDefinition);
 
     /**
      * 删除路由
      * @param id
      * @return
      */
-    String delete(String id);
-
-
-    /**
-     * 查询全部数据
-     * @return
-     */
-    CustomPageResult<GatewayRoutesVO> findAll(Map<String, Object> params);
+	BasicLogicResult<String> delete(String id);
 
     /**
      *  同步redis数据 从mysql中同步过去
      *
      * @return
      */
-    String synchronization();
-
-
-    /**
-     * 更改路由状态
-     * @param params
+	BasicLogicResult<String> synchronization();
+	
+	/**
+     * 上线路由
+     * @param
      * @return
      */
-    String updateFlag(Map<String, Object> params);
-
-
+	BasicLogicResult<String> online(String routeId, int status);
+	
+	/**
+     * 下线路由
+     * @param
+     * @return
+     */
+	BasicLogicResult<String> offline(String routeId, int status);
 }

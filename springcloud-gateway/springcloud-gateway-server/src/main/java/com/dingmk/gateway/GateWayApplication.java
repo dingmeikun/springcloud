@@ -3,20 +3,22 @@ package com.dingmk.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * @author dingmeikun
- * @see 目前版本1.0.0，项目从springboot-1.5.2 D版本升级到springboot-2.0.9 F版本，中间支持disconf有点问题，原因在于新版disconf去除了一个方法parseStringValue，详情可参考：https://blog.csdn.net/ai_xao/article/details/86525196
+ * 统一网关入口
+ * 动态路由规则：
+ * 	默认本地缓存1分钟，远程缓存1天，数据落到MySQL(只有下游服务状态：下线、上线、更新时，多节点才会有不一致的情况)
+ * 	1.设置自动轮询刷新DB->Redis,轮询间隔为10分钟
+ * 	2.设置手动刷新DB->Redis,可人为使用命令刷新缓存
  * 
- * @see 使用过程中需要注意
- * 	1.启动类GateWayApplication需要增加包扫描配置注解：@ComponentScan(basePackages = {"com.dingmk"}),以防disconf对当前项目配置类不能读取
- * 	2.配置类DisconfConfig需要随当前项目的包名前缀，以及部分集成过后的框架包(tim-database,tim-redis-cache默认是：xy.dingmk)一致，否则导致disconf不能扫描到配置类，以及框架包内的配置类
+ * @author dingmeikun
  *
- *	@see 当前的问题
- *	1.缓存框架还未做迁移，项目启动将会报错：XyCacheManager的bean找不到！因为缓存框架xy-configuration-cache-redis的默认路径包是：com.xy，需要引入自己的包(tim-redis-cache:xy.dingmk)
- *	
  */
+@EnableScheduling
+@EnableDiscoveryClient
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ComponentScan(basePackages = {"com.dingmk"})
 public class GateWayApplication {

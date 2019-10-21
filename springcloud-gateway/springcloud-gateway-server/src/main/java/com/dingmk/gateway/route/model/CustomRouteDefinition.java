@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Gateway自定义路由模型
+ * Gateway自定义路由模型(Redis数据对象)
  */
 @EqualsAndHashCode
 @Builder
@@ -47,4 +47,17 @@ public class CustomRouteDefinition {
      * 	路由描述
      */
     private String description;
+    
+    public boolean valide() {
+    	boolean valid = true;
+    	if (null == id || (id = id.trim()).isEmpty()) {
+    		valid = false;
+    	}
+    	
+    	if (null == uri || (uri = uri.trim()).isEmpty()) {
+    		valid = false;
+    	}
+    	
+    	return valid;
+    }
 }

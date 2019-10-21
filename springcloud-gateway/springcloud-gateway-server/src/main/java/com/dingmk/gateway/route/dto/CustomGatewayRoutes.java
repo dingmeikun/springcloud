@@ -2,9 +2,17 @@ package com.dingmk.gateway.route.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+/**
+ * 数据库存储对象
+ * 
+ * @author dingmeikun
+ *
+ */
 @Getter
 @Setter
+@ToString
 public class CustomGatewayRoutes {
 	
 	/** 路由ID */
@@ -33,4 +41,25 @@ public class CustomGatewayRoutes {
     
     /** 更新时间 */
     private String updateTime;
+    
+    public boolean valide() {
+    	boolean valid = true;
+    	if (null == routeId || (routeId = routeId.trim()).isEmpty()) {
+    		valid = false;
+    	}
+    	
+    	if (null == uri || (uri = uri.trim()).isEmpty()) {
+    		valid = false;
+    	}
+    	
+    	if (null == status || 0 == status) {
+    		valid = false;
+    	}
+    	
+    	if (null == createTime || (createTime = createTime.trim()).isEmpty()) {
+    		valid = false;
+    	}
+    	
+    	return valid;
+    }
 }

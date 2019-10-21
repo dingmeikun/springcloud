@@ -7,6 +7,15 @@ eureka:
 feign:
     hystrix:
         enabled: true
+
+hystrix:
+   command:
+      fallbackcmd:
+         execution:
+            isolation:
+               thread:
+                  timeoutInMilliseconds: 2000
+
 logging:
     level:
         org:
@@ -43,7 +52,3 @@ spring:
         base-url: http://192.168.101.15:9707
         service:
             name: gateway-server
-    data:
-        cache:
-            expire: 30
-            max_numsize: 10
