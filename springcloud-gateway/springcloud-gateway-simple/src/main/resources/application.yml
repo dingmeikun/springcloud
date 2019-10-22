@@ -18,6 +18,3 @@ eureka:
 
 logging: 
     config: classpath:logback-spring.xml
-    
-num:
-   cron: 0 0/1 * * * ?

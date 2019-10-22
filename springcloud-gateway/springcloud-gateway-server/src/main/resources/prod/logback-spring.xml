@@ -5,8 +5,8 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 
     <contextName>GateWayServer</contextName>
 
-    <property name="LOG_HOME" value="/logdata/gateway_server"/>
-    <property name="MODULE_NAME" value="gateway_server"/>
+    <property name="LOG_HOME" value="/logdata/gateway"/>
+    <property name="MODULE_NAME" value="gateway"/>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>

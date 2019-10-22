@@ -9,7 +9,7 @@ export app_name="${app_dir##*/}"
 export jar_name="$(ls ${app_dir}/*.jar | awk -F '/' '{print $NF}'|head -1)"
 export log_dir="/logdata/${app_name}"
 export pid_file="${app_name}.pid"
-export jvm_mem='-Xms2048m -Xmx2048m -Xmn1024m'
+export jvm_mem='-Xms1024m -Xmx1024m -Xmn375m'
 
 start(){
     cd ${app_dir}

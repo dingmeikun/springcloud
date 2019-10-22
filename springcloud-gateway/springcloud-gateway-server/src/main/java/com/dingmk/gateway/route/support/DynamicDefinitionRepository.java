@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.annotation.Configuration;
@@ -45,24 +46,27 @@ public class DynamicDefinitionRepository implements RouteDefinitionRepository {
 	
 	@Resource
     private XyJedisPool jedisPool;
-
-	/** 缓存过期时间 */
-	@Value("${gateway.local.cache.expire}")
-	private int expire;
-
-	/** 缓存初始大小 */
-	@Value("${gateway.local.cache.capacity}")
-	private int capacity;
 	
 	/**
-	 * <b> BUG 指定size和expire不生效  </b>
+	 * <b> 初始化本地缓存配置：最大路由size为10，本次缓存时间60秒(默认) </b>
 	 */
 	private Cache<String, Map<String, RouteDefinition>> cache = CacheBuilder.newBuilder()
             .initialCapacity(10).expireAfterWrite(60, TimeUnit.SECONDS).build();
 	
+	@PostConstruct
+	public void initCache() {
+		cache = CacheBuilder.newBuilder()
+	            .initialCapacity(baseConfig.getCacheCapacity()).expireAfterWrite(baseConfig.getCacheExpire(), TimeUnit.SECONDS).build();
+	}
+	
 	/**
 	 * 获取全部路由
-	 * <b>使用v2缓存框架：先获取本地缓存，拿不到再获取redis缓存，还获取不到就回调获取DB路由信息(框架层设置回缓存)</b>
+	 * <b>
+	 * 	1.获取本地缓存数据，如有则直接返回，如没有执行2
+	 * 	2.获取redis数据，返回数据，执行3
+	 * 	3.以上1,2如果都没数据，则查询db，返回db数据并将数据插入到本地缓存(如果有数据且为redis缓存，则也插入到本地缓存)
+	 *	4.如果发生异常则查询数据库获取数据(查询数据库已设置300qps限制)
+	 * </b>
 	 * 
 	 * @return
 	 */
@@ -113,6 +117,9 @@ public class DynamicDefinitionRepository implements RouteDefinitionRepository {
 			}
 			
 			return Flux.fromIterable(cacheRoutes.values());
+		} catch (ExecutionException e1) {
+			log.error("ROUTES_DEFINITIONS_LOCALCACHE MEET EXECUTION EXCEPTION! {}", e1.getMessage(), e1);
+			return Flux.empty();
 		} catch (Exception e) {
 			log.error("ROUTES_DEFINITIONS_EXCEPTION:{}", e.getMessage(), e);
 			
