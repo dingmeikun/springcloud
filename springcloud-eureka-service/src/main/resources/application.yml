@@ -1,14 +1,41 @@
 server:
-  port: 8001
+   port: 8001
   
 logging: 
-    config: classpath:logback-spring.xml
+   config: classpath:logback-spring.xml
 
 spring: 
-    application:
+   application:
         name: eureka-service
-        
-eureka: 
-  client:
-    serviceUrl:
-          defaultZone: http://192.168.101.15:8000/eureka
+   zipkin:
+      base-url: http://192.168.101.15:9707
+   sleuth:
+      sampler:
+         percentage: 1.0
+         
+eureka:
+   client:
+      serviceUrl:
+         defaultZone: http://192.168.101.15:8000/eureka
+      instance: 
+         prefer-ip-address: true
+--- 
+## turbine
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      cors:
+        allowed-origins: "*"
+        allowed-methods: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+  security:
+    enabled: false
+  boot:
+    admin:
+      api-path: instances
+      auto-registration: true
+      url: http://192.168.101.15:9709

@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.dingmk.eureka.model.BaseRequest;
 import com.dingmk.eureka.model.BaseResponse;
+import com.dingmk.eureka.model.BaseRequest.Location;
+import com.dingmk.eureka.model.BaseResponse.Address;
 import com.dingmk.eureka.service.BaseService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +22,7 @@ public class BaseController {
 	@Autowired
 	private BaseService service;
 
+	@HystrixCommand(fallbackMethod = "bizFallback")
 	@PostMapping("/data/service/query/v1")
     public BaseResponse queryForList(@RequestBody BaseRequest request) {
         if (log.isDebugEnabled()) {
@@ -34,4 +38,15 @@ public class BaseController {
         return result;
     }
 	
+	public BaseResponse bizFallback(@RequestBody BaseRequest request) {
+		Location location = request.getLocation();
+		Address address = new Address();
+		
+		BaseResponse response = new BaseResponse();
+		response.setCoordsys("Hystrix Fallback");
+		response.setLocation(location.getLng() + ", " + location.getLat());
+		response.setAddress(address);
+		
+		return response;
+    }
 }
