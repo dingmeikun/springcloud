@@ -1,13 +1,23 @@
 server:
-  port: 8006
+   port: 8006
   
 logging: 
-    config: classpath:logback-spring.xml
+   config: classpath:logback-spring.xml
 
 spring: 
-    application:
+   application:
         name: turbine-node1
-        
+   zipkin:
+      base-url: http://192.168.101.15:9707
+   sleuth:
+      sampler:
+         percentage: 1.0
+   boot:
+      admin:
+         api-path: instances
+         auto-registration: true
+         url: http://192.168.101.15:9708
+
 eureka: 
    client:
       serviceUrl:
@@ -47,3 +57,30 @@ hystrix:
             isolation:
                thread:
                   timeoutInMilliseconds: 2000
+   print: ## 打印熔断日志频率
+      frequency:
+         times: 1
+
+endpoints:
+    actuator:
+        enabled: true
+        sensitive: false
+    beans:
+        enabled: true
+        sensitive: false
+    health:
+        enabled: true
+        sensitive: false
+management:
+    endpoints:
+        health:
+            show-details: always
+        web:
+            cors:
+                allowed-methods: '*'
+                allowed-origins: '*'
+            exposure:
+                base-path: /
+                include: '*'
+    security:
+        enabled: false

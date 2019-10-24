@@ -16,6 +16,7 @@
         <module>spring-turbine-dashboard</module>
 		<module>spring-turbine-node1</module>
 		<module>spring-turbine-node2</module>
+		<module>spring-turbine-server</module>
     </modules>
 	
 	<dependencyManagement>
@@ -38,6 +39,11 @@
 			<dependency>
 				<groupId>com.dingmk.learn</groupId>
 				<artifactId>spring-turbine-node2</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dingmk.learn</groupId>
+				<artifactId>spring-turbine-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>

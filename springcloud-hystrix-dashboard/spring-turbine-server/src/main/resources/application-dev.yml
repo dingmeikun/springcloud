@@ -1,0 +1,38 @@
+server:
+  port: 9709
+
+spring:
+  application:
+    name: turbine-server
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.101.15:8000/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      cors:
+        allowed-origins: "*"
+        allowed-methods: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+
+turbine:
+  app-config: eureka-service,turbine-node1
+  aggregator:
+    clusterConfig: default
+  clusterNameExpression: new String("default")
+  combine-host: true
+  instanceUrlSuffix:
+    default: /actuator/hystrix.stream
+  endpoints:
+    web:
+      base-path: actuator
