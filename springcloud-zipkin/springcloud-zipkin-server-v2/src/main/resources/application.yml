@@ -1,3 +1,11 @@
+---
+# spring基础配置
+spring: 
+   application: 
+      name: zipkin-server
+   main:
+      allow-bean-definition-overriding: true
+
 server: 
    port: 9707
    
@@ -10,31 +18,34 @@ eureka:
          defaultZone: http://localhost:8000/eureka/
 
 ---
-spring: 
-   application: 
-      name: zipkin-server
-
----
 # 客户端负载均衡器
-ribbon:
-   ConnectTimeout: 3000 # 客户端连接超时
-   ReadTimeout: 60000 # 客户端读取超时
-   MaxAutoRetries: 1 # 当前环境最大重试次数
-   MaxAutoRetriesNextServer: 2 # 其他环境最大重试次数
-   eureka:
-      enabled: true
+#ribbon:
+#   ConnectTimeout: 3000 # 客户端连接超时
+#   ReadTimeout: 60000 # 客户端读取超时
+#   MaxAutoRetries: 1 # 当前环境最大重试次数
+#   MaxAutoRetriesNextServer: 2 # 其他环境最大重试次数
+#   eureka:
+#      enabled: true
 
 ---
-hystrix:
-   command:
-      default:
-         execution:
-            timeout:
-               enabled: false
-
+# 熔断配置
+#hystrix:
+#   command:
+#      default:
+#         execution:
+#            timeout:
+#               enabled: false
 ---
 management:
    metrics:
       web:
          server:
-            auto-time-requests: true
+            auto-time-requests: false
+   endpoints:
+      web:
+         exposure:
+            include: "*"
+         cors:
+            allowed-origins: "*"
+            allowed-methods: "*"
+
