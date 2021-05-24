@@ -6,7 +6,6 @@
 		<groupId>com.dingmk.learn</groupId>
 		<artifactId>springcloud-parent</artifactId>
 		<version>1.0.0</version>
-		<relativePath/>
 	</parent>
 	<artifactId>springcloud-hystrix-dashboard</artifactId>
 	<packaging>pom</packaging>

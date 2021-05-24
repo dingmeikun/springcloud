@@ -6,7 +6,6 @@
 		<groupId>com.dingmk.learn</groupId>
 		<artifactId>springcloud-zipkin</artifactId>
 		<version>1.0.0</version>
-		<relativePath/>
 	</parent>
 	<artifactId>springcloud-zipkin-zuul</artifactId>
 	

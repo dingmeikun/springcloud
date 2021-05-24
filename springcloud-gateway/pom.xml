@@ -6,7 +6,6 @@
 		<groupId>com.dingmk.learn</groupId>
 		<artifactId>springcloud-parent-v2</artifactId>
 		<version>1.0.0</version>
-		<relativePath/>
 	</parent>
 	<artifactId>springcloud-gateway</artifactId>
 	<packaging>pom</packaging>

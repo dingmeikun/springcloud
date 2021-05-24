@@ -6,8 +6,9 @@
 		<groupId>com.dingmk.learn</groupId>
 		<artifactId>springcloud-parent</artifactId>
 		<version>1.0.0</version>
-		<relativePath/>
 	</parent>
+
+
 	<artifactId>springcloud-zipkin</artifactId>
 	<packaging>pom</packaging>
 	
